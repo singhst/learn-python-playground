@@ -1,4 +1,4 @@
-from helper.common import commonHelper
+from scrape.helper import commonHelper
 
 import urllib.request
 from bs4 import BeautifulSoup
