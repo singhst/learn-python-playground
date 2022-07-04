@@ -15,7 +15,6 @@ example:
     https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=21
 """
 
-# from helper.common import commonHelper
 from scrape.scrapeProductList import scrapeProductList
 
 
