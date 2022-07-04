@@ -17,7 +17,12 @@ $ python main.py
 Expected output from terminal:
 
 ```shell
-$ python main.py 
+# see current path
+$ pwd
+xxxx/learn-python-playground/webscrape-toy-figure-website
+
+# run
+$ python app/main.py 
 >>> _whole_url: https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=0
 >>> Created folder: ./product_list//html/shop=05-001/dt=20220704/
 >>> _whole_url: https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=1
@@ -57,4 +62,20 @@ $ python main.py
 15    25                    FiguartsZERO 白星公主 [7月 發送]     /hk/item/N2171128001001  https://p-bandai.com/img/hk/p/t/N2171128001001...  
 16    25    FiguartsZERO 白星公主 [7月 發送] (Free Shipping)     /hk/item/N2171128001002  https://p-bandai.com/img/hk/p/t/N2171128001002...
   
+```
+
+
+list all files:
+
+```shell
+# see current path
+$ pwd
+xxxx/learn-python-playground/webscrape-toy-figure-website
+
+$ ls -l
+-rw-r--r--  1 user  staff    3963  4 Jul 22:51 README.md
+drwxr-xr-x  6 user  staff     192  4 Jul 23:00 app
+drwxr-xr-x  4 user  staff     128  4 Jul 23:05 product_list
+-rw-r--r--  1 user  staff     418  4 Jul 00:51 requirements.txt
+drwxr-xr-x  7 user  staff     224  4 Jul 01:26 venv
 ```
