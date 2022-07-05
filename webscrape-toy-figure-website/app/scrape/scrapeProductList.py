@@ -1,3 +1,4 @@
+from typing import List, Union
 from scrape.helper import commonHelper
 
 import urllib.request
@@ -18,12 +19,12 @@ class scrapeProductList(commonHelper):
         self.scraped_file_folder = scraped_file_folder
 
         self._page_number = 0
-        self.df_list = []
+        self.data_list: List[dict] = []     #: List[pd.Dataframe] = []
 
 
     def scrapeOnePageData(self,
                           url: str
-                          ) -> pd.DataFrame:
+                          ) -> List[dict]:  #pd.DataFrame:
         """Gets table data from the web. Return the extracted table as `pandas` `dataframe`.
 
         Parameters
@@ -34,8 +35,7 @@ class scrapeProductList(commonHelper):
 
         Returns
         -------
-        pd.Dataframe
-            `dataframe` of names of xxxxx.
+        `list of dict`
         """
 
         # add User-Agent to header to pretend as browser visit, more detials can be found in FireBug plugin
@@ -60,12 +60,13 @@ class scrapeProductList(commonHelper):
             result = {
                 "page"              : self._page_number,
                 "name"              : product.find("img", {"class": "img-responsive"}).get("alt"),
-                "shop_product_code" : product.find("a", {"class": "m-card m-card--lg js-hover"}).get("href"),
+                "shop_product_code" : product.find("a", {"class": "m-card m-card--lg js-hover"}).get("href").replace("/hk/item/", ""),
                 "img_url"           : product.find("img", {"class": "img-responsive"}).get("src"),
             }
             data.append(result)
 
-        return pd.DataFrame(data)
+        # sing> change back to return `list of dict`
+        return data #pd.DataFrame(data)
 
 
     def scrapeAllPageData(self):
@@ -78,22 +79,35 @@ class scrapeProductList(commonHelper):
             _whole_url = self.url_pattern.format(self.shop, self._page_number)
             print('>>> _whole_url:', _whole_url)
 
-            _df = self.scrapeOnePageData(_whole_url)
-            self.df_list.append(_df)
+            # _df = self.scrapeOnePageData(_whole_url)
+            # if _df.empty:
+            #     valid_page = False
 
-            if _df.empty:
+            # self.data_list.append(_df)
+
+            _data = self.scrapeOnePageData(_whole_url)
+            if len(_data) <= 0:
                 valid_page = False
 
+            self.data_list.extend(_data)
+
             self._page_number += 1
-            break
+
+            # if (self._page_number >= 2):
+            #     break
 
 
-    def getAllPageData(self) -> pd.DataFrame:
-        _df = pd.concat(self.df_list)
+    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+        _df = pd.DataFrame(self.data_list)
         filename = f"shop={self.shop}"
-        self.saveFile(data=_df, 
-                 shop=self.shop,
-                 folder=self.scraped_file_folder,
-                 filename=filename, 
-                 data_type="csv")
-        return _df
+        self.saveFile(data=_df,
+                      shop=self.shop,
+                      folder=self.scraped_file_folder,
+                      filename=filename,
+                      data_type="csv")
+
+        return_data = {
+            'dict_list': self.data_list,
+            'dataframe': _df,
+        }
+        return return_data[return_type]
