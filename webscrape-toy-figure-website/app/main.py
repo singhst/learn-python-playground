@@ -25,6 +25,7 @@ routing pattern,
 """
 
 from scrape.scrapeProductList import scrapeProductList
+from scrape.scrapeProductDetail import scrapeProductDetail
 
 import pandas as pd
 pd.set_option("display.max_columns", None)
@@ -38,7 +39,8 @@ def main():
         'domain': "https://p-bandai.com",
         'product_list_slug': "/hk/search?text=&sort=relevance&shop={}&page={}",
         'product_detail_slug': "/hk/item/{shop_product_code}",
-        'scraped_file_folder': "./product_list/",
+        'scraped_product_list_file_folder': "./product_list/",
+        'scraped_product_detail_file_folder': "./product_detail/",
     }
     config['product_list_url'] = config.get('domain') + config.get('product_list_slug')
     config['product_detail_url'] = config.get('domain') + config.get('product_detail_slug')
@@ -46,26 +48,36 @@ def main():
 
 
     ## (1) Product list
-    productListScrapper = scrapeProductList(url=config.get("product_list_url"),
+    listScrapper = scrapeProductList(url_pattern=config.get("product_list_url"),
                                             shop=config.get("shop"),
-                                            scraped_file_folder=config.get("scraped_file_folder"))
-    productListScrapper.scrapeAllPageData()
+                                            scraped_file_folder=config.get("scraped_product_list_file_folder"))
+    listScrapper.scrapeAllPageData()
 
-    _results = productListScrapper.getAllPageData(return_type='dict_list')
+    _product_list = listScrapper.getAllPageData(return_type='dict_list')
 
-    print(len(_results), len(_results[0].keys()))
-    print(_results[:3])
+    print(len(_product_list), len(_product_list[0].keys()))
+    print(_product_list[:3])
     print()
-    print(_results[-3:])
+    print(_product_list[-3:])
 
-    shop_product_codes = [_['shop_product_code'] for _ in _results]
-    print(shop_product_codes[:3])
+    # shop_product_codes = [_['shop_product_code'] for _ in _results]
+    # print(shop_product_codes[:3])
 
 
     ### (2) Each product detail
-    # for _code in shop_product_codes:
-        # ... scrape each product code's detail ...
-        
+    detailScrapper = scrapeProductDetail(url_pattern="https://p-bandai.com/hk/item/{shop_product_code}",
+                            shop=config.get("shop"),
+                            scraped_file_folder=config.get("scraped_product_detail_file_folder"),
+                            existing_product_list=_product_list
+                            )
+
+    detailScrapper.scrapeAllPageData()
+    _product_details = detailScrapper.getAllPageData()
+
+    print(len(_product_details), len(_product_details[0].keys()))
+    print(_product_details[:3])
+    print()
+    print(_product_details[-3:])
 
 
 if __name__ == "__main__":

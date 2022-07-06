@@ -10,11 +10,11 @@ pd.set_option("display.max_columns", None)
 class scrapeProductList(commonHelper):
 
     def __init__(self,
-                 url: str,
+                 url_pattern: str,
                  shop: str,
                  scraped_file_folder: str="",
                  ) -> None:
-        self.url_pattern = url
+        self.url_pattern = url_pattern
         self.shop = shop
         self.scraped_file_folder = scraped_file_folder
 
@@ -93,11 +93,15 @@ class scrapeProductList(commonHelper):
 
             self._page_number += 1
 
-            # if (self._page_number >= 2):
-            #     break
+            if (self._page_number >= 2):
+                break
 
 
     def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+        '''
+        `return_type`: `str`, "dict_list" or "dataframe"
+        '''
+
         _df = pd.DataFrame(self.data_list)
         filename = f"shop={self.shop}"
         self.saveFile(data=_df,
