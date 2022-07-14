@@ -5,31 +5,12 @@ https://medium.com/swlh/how-to-connect-to-mysql-docker-from-python-application-o
 
 """
 
-import sqlalchemy as db
-
-# # specify database configurations
-# config = {
-#     'host': 'localhost',
-#     'port': 5432,
-#     'user': 'postgres',
-#     'password': 'pwd0123456789',
-#     'database': 'my_database'
-# }
-# db_user = config.get('user')
-# db_pwd = config.get('password')
-# db_host = config.get('host')
-# db_port = config.get('port')
-# db_name = config.get('database')
-# # specify connection string
-# # psql postgresql://postgres:pwd0123456789@localhost:5432/my_database
-# connection_str = f'postgresql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}'
-# # connect to database
-# engine = db.create_engine(connection_str)
+from sqlalchemy import text, create_engine
 
 SQLALCHEMY_DATABASE_URI = "sqlite:///example.db"    #database connection string
 
 # [For SQLite connection]
-engine = db.create_engine(
+engine = create_engine(
     SQLALCHEMY_DATABASE_URI,
     # only required for sqlite
     connect_args={"check_same_thread": False},
@@ -41,7 +22,91 @@ print(connection)
 ### output
 # <sqlalchemy.engine.base.Connection object at 0x103f16e80>
 
-metadata = db.MetaData(bind=engine)
+
+#########################################
+
+from sqlalchemy.orm import sessionmaker
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+print(SessionLocal)
+### output
+# sessionmaker(class_='Session', bind=Engine(sqlite:///example.db), autoflush=False, autocommit=False, expire_on_commit=True)
+
+
+#########################################
+# Implement raw sql
+# 
+#########################################
+
+db = SessionLocal()
+
+# write the SQL query inside the text() block
+
+### (0) drop table
+sql = text("""
+DROP TABLE IF EXISTS company;
+""")
+db.execute(sql)
+
+### (1) create table
+sql = text("""
+CREATE TABLE IF NOT EXISTS company (
+	id int NOT NULL,
+	name varchar(255) NOT NULL,
+	ceo varchar(255) NOT NULL
+);
+""")
+db.execute(sql)
+
+### (2) insert data
+data = ({"id": 1, "name": "The Hobbit", "ceo": "Tolkien"},
+        {"id": 2, "name": "The Silmarillion", "ceo": "Tolkien"},
+        {"id": 3, "name": "Google", "ceo": "aaa"},
+        {"id": 4, "name": "NVDA", "ceo": "bbb"},
+        )
+
+for line in data:
+    sql = text("""
+    INSERT INTO company(id, name, ceo) VALUES(:id, :name, :ceo)
+    """)
+    _engine = db.get_bind()
+    _engine.execute(sql, **line)
+
+### (2) sql bulk insert
+sql = text("""
+INSERT INTO company(id, name, ceo) VALUES 
+(99,'bulk1','ceo1'),
+(88,'bulk2','ceo2'),
+(77,'bulk3','ceo3'),
+(66,'bulk4','ceo4');
+""")
+# db.execute(sql)       #not work
+_engine = db.get_bind()
+_engine.execute(sql)
+
+
+### (3) query table
+sql = text("""
+SELECT * 
+from company 
+""")
+
+results = db.execute(sql)
+print(list(results))
+
+### Output
+# [
+#     (1, 'The Hobbit', 'Tolkien'),
+#     (2, 'The Silmarillion', 'Tolkien'),
+#     (3, 'Google', 'aaa'),
+#     (4, 'NVDA', 'bbb')
+# ]
+
+################################################
+
+from sqlalchemy import MetaData
+
+metadata = MetaData(bind=engine)
 metadata.reflect(only=['company'])
 
 test_table = metadata.tables['company']
