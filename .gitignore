@@ -1,4 +1,6 @@
 *venv*
 
 webscrape-toy-figure-website/product_list/html/*
-webscrape-toy-figure-website/app/*/__pycache__*
+*/__pycache__*
+*/*/__pycache__*
+*/*/*/__pycache__*
