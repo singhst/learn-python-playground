@@ -6,30 +6,21 @@ https://docs.sqlalchemy.org/en/14/orm/quickstart.html
 # #########################################
 # # 1 Declare Data Models
 # #########################################
-from typing import List
-from sqlalchemy import Column, Integer, String, null
-from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
-
-class Company(Base):
-    __tablename__ = "company"
-    id = Column(Integer, nullable=False, primary_key=True)
-    company_code = Column(String(256), nullable=False)
-    name = Column(String(256), nullable=False)
-    ceo = Column(String(256), nullable=False)
-
-    def __repr__(self):
-        return f"User(id={self.id!r}, company_code={self.company_code!r}, name={self.name!r}, ceo={self.ceo!r})"
-
+from data_model import Company
 
 
 #########################################
 # 2 Create an Engine
 #########################################
+import configparser
+config = configparser.ConfigParser()
+config.read("./config.ini")
+SQLALCHEMY_DATABASE_URI = config["sqlite"].get("connection_str") #"sqlite:///example.db"    #database connection string
+print(SQLALCHEMY_DATABASE_URI)
+
+
 from sqlalchemy import text, create_engine
 from sqlalchemy.orm import sessionmaker
-
-SQLALCHEMY_DATABASE_URI = "sqlite:///example.db"    #database connection string
 
 # [For SQLite connection]
 engine = create_engine(
@@ -66,6 +57,8 @@ print(list(results))
 #########################################
 # 5 Bulk update
 #########################################
+from typing import List
+
 _data = [
     {"company_code":"c99", "name":"bulk1",             "ceo":"bulk update"},
     {"company_code":"e77", "name":"bulk update e77",   "ceo":"ceo3"},

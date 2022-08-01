@@ -6,8 +6,14 @@ https://medium.com/swlh/how-to-connect-to-mysql-docker-from-python-application-o
 """
 
 from sqlalchemy import text, create_engine
+import configparser
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///example.db"    #database connection string
+full_config_file_path = "./config.ini"
+config = configparser.ConfigParser()
+config.read(full_config_file_path)
+
+SQLALCHEMY_DATABASE_URI = config["sqlite"].get("connection_str") #"sqlite:///example.db"    #database connection string
+print(SQLALCHEMY_DATABASE_URI)
 
 # [For SQLite connection]
 engine = create_engine(
@@ -48,7 +54,7 @@ DROP TABLE IF EXISTS company;
 """)
 db.execute(sql)
 
-### (1) create table
+### (1.1) create table
 sql = text("""
 CREATE TABLE IF NOT EXISTS company (
     id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -60,6 +66,21 @@ CREATE TABLE IF NOT EXISTS company (
 );
 """)
 db.execute(sql)
+print(">>> 1.1 raw sql created table")
+
+sql = text("""
+DROP TABLE IF EXISTS company;
+""")
+db.execute(sql)
+print(">>> 1.1 raw sql dropped table")
+
+### (1.2) create table
+# https://docs.sqlalchemy.org/en/14/orm/tutorial.html
+from sqlalchemy import MetaData
+from data_model import Base
+Base.metadata.create_all(engine)
+print(">>> 1.2 Python Class created table")
+
 
 ### (2) insert data
 data = ({"id": 1, "company_code":"N1", "name": "The Hobbit",         "ceo": "Tolkien",},
