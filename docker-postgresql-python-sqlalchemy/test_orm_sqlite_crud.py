@@ -5,7 +5,6 @@ https://medium.com/swlh/how-to-connect-to-mysql-docker-from-python-application-o
 
 """
 
-from sqlalchemy import text, create_engine
 import configparser
 
 full_config_file_path = "./config.ini"
@@ -15,7 +14,10 @@ config.read(full_config_file_path)
 SQLALCHEMY_DATABASE_URI = config["sqlite"].get("connection_str") #"sqlite:///example.db"    #database connection string
 print(SQLALCHEMY_DATABASE_URI)
 
+
 # [For SQLite connection]
+from sqlalchemy import text, create_engine
+
 engine = create_engine(
     SQLALCHEMY_DATABASE_URI,
     # only required for sqlite
