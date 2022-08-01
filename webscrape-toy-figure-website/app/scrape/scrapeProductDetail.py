@@ -1,7 +1,7 @@
 from typing import List, Union
 from urllib.error import HTTPError, URLError
-from scrape.helper import commonHelper
-from scrape import helper
+from app.scrape.helper import commonHelper
+from app.scrape import helper
 
 import re
 import urllib.request
@@ -130,18 +130,19 @@ class scrapeProductDetail(commonHelper):
             self.data_list.append(_data)
 
 
-    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list', save_as_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
         '''
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
 
         _df = pd.DataFrame(self.data_list)
-        filename = f"shop={self.shop}"
-        self.saveFile(data=_df,
-                      shop=self.shop,
-                      folder=self.scraped_file_folder,
-                      filename=filename,
-                      data_type="csv")
+        if save_as_csv:
+            filename = f"shop={self.shop}"
+            self.saveFile(data=_df,
+                          shop=self.shop,
+                          folder=self.scraped_file_folder,
+                          filename=filename,
+                          data_type="csv")
 
         return_data = {
             'dict_list': self.data_list,

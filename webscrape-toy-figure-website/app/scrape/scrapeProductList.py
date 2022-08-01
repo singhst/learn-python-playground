@@ -13,12 +13,14 @@ class scrapeProductList(commonHelper):
                  url_pattern: str,
                  shop: str,
                  scraped_file_folder: str="",
+                 max_page_number: int=1000,
                  ) -> None:
         self.url_pattern = url_pattern
         self.shop = shop
         self.scraped_file_folder = scraped_file_folder
+        self.max_page_number = max_page_number
 
-        self._page_number = 0
+        self._page_number: int = 0               # current scrapping page number of the product list
         self.data_list: List[dict] = []     #: List[pd.Dataframe] = []
 
 
@@ -79,12 +81,14 @@ class scrapeProductList(commonHelper):
             _whole_url = self.url_pattern.format(self.shop, self._page_number)
             print('>>> _whole_url:', _whole_url)
 
+            ### Using pandas df as data structure
             # _df = self.scrapeOnePageData(_whole_url)
             # if _df.empty:
             #     valid_page = False
 
             # self.data_list.append(_df)
 
+            ### Using `list of dict` as data structure
             _data = self.scrapeOnePageData(_whole_url)
             if len(_data) <= 0:
                 valid_page = False
@@ -93,22 +97,25 @@ class scrapeProductList(commonHelper):
 
             self._page_number += 1
 
-            if (self._page_number >= 2):
+            if (self._page_number >= self.max_page_number):
                 break
 
 
-    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list', save_as_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
         '''
+        Save the scraped product details into `.csv`, and return based on input.
+        
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
 
         _df = pd.DataFrame(self.data_list)
-        filename = f"shop={self.shop}"
-        self.saveFile(data=_df,
-                      shop=self.shop,
-                      folder=self.scraped_file_folder,
-                      filename=filename,
-                      data_type="csv")
+        if save_as_csv:
+            filename = f"shop={self.shop}"
+            self.saveFile(data=_df,
+                          shop=self.shop,
+                          folder=self.scraped_file_folder,
+                          filename=filename,
+                          data_type="csv")
 
         return_data = {
             'dict_list': self.data_list,

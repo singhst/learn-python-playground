@@ -23,13 +23,20 @@ routing pattern,
     example:
         https://p-bandai.com/hk/item/N2623282001001
 """
+from pathlib import Path
 
-from scrape.scrapeProductList import scrapeProductList
-from scrape.scrapeProductDetail import scrapeProductDetail
+from app.scrape.scrapeProductList import scrapeProductList
+from app.scrape.scrapeProductDetail import scrapeProductDetail
 
 import pandas as pd
 pd.set_option("display.max_columns", None)
 
+
+# Project Directories
+ROOT = Path(__file__).resolve().parent.parent
+BASE_PATH = Path(__file__).resolve().parent
+print(BASE_PATH)
+print(ROOT)
 
 def main():
 
@@ -49,11 +56,13 @@ def main():
 
     ## (1) Product list
     listScrapper = scrapeProductList(url_pattern=config.get("product_list_url"),
-                                            shop=config.get("shop"),
-                                            scraped_file_folder=config.get("scraped_product_list_file_folder"))
+                                     shop=config.get("shop"),
+                                     scraped_file_folder=config.get("scraped_product_list_file_folder"),
+                                     max_page_number=2,
+                                     )
     listScrapper.scrapeAllPageData()
 
-    _product_list = listScrapper.getAllPageData(return_type='dict_list')
+    _product_list = listScrapper.getAllPageData(return_type='dict_list', save_as_csv=True)
 
     print(len(_product_list), len(_product_list[0].keys()))
     print(_product_list[:3])
@@ -66,13 +75,13 @@ def main():
 
     ### (2) Each product detail
     detailScrapper = scrapeProductDetail(url_pattern="https://p-bandai.com/hk/item/{shop_product_code}",
-                            shop=config.get("shop"),
-                            scraped_file_folder=config.get("scraped_product_detail_file_folder"),
-                            existing_product_list=_product_list
-                            )
+                                         shop=config.get("shop"),
+                                         scraped_file_folder=config.get("scraped_product_detail_file_folder"),
+                                         existing_product_list=_product_list
+                                         )
 
     detailScrapper.scrapeAllPageData()
-    _product_details = detailScrapper.getAllPageData()
+    _product_details = detailScrapper.getAllPageData(return_type='dict_list', save_as_csv=True)
 
     print(len(_product_details), len(_product_details[0].keys()))
     print(_product_details[:3])
