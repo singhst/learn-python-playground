@@ -77,6 +77,7 @@ _data = [
 
 ### (1) Get all data in the DB
 _original_companies = db.query(Company).all()
+_max_id = max([_.id for _ in _original_companies])
 _original_company_codes = [company.company_code for company in _original_companies]
 
 ### (2) split
@@ -89,23 +90,24 @@ for _new_company in _data:
         _new_company["id"] = _original_company_id
         _update.append(_new_company)
     else:
-        _new_company["id"] = null
+        _max_id += 1
+        _new_company["id"] = _max_id
         _insert.append(_new_company)
 
 print(">>> _update={}".format(_update))
 print(">>> _insert={}".format(_insert))
 
 
-# Bulk update
+### (3.1) Bulk update
 db.bulk_update_mappings(Company, _update)
 db.commit()
 
 results = db.query(Company).all()
 print(results)
 
-# # Bulk insert
-# db.bulk_insert_mappings(Company, _insert)
-# db.commit()
+### (3.2) Bulk insert
+db.bulk_insert_mappings(Company, _insert)
+db.commit()
 
-# results = db.query(Company).all()
-# print(results)
+results = db.query(Company).all()
+print(results)

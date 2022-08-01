@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS company (
     id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
     company_code varchar(255) NOT NULL,
     name varchar(255) NOT NULL,
-    ceo varchar(255) NOT NULL
+    ceo varchar(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """)
 db.execute(sql)
