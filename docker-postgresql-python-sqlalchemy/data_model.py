@@ -15,7 +15,7 @@ Base = declarative_base()
 class Company(Base):
     __tablename__ = "company"
     id = Column(Integer, nullable=False, primary_key=True)
-    company_code = Column(String(256), nullable=False)
+    company_code = Column(String(256), nullable=False, index=True)
     name = Column(String(256), nullable=False)
     ceo = Column(String(256), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now)
