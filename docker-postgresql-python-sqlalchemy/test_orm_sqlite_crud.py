@@ -5,11 +5,19 @@ https://medium.com/swlh/how-to-connect-to-mysql-docker-from-python-application-o
 
 """
 
-from sqlalchemy import text, create_engine
+import configparser
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///example.db"    #database connection string
+full_config_file_path = "./config.ini"
+config = configparser.ConfigParser()
+config.read(full_config_file_path)
+
+SQLALCHEMY_DATABASE_URI = config["sqlite"].get("connection_str") #"sqlite:///example.db"    #database connection string
+print(SQLALCHEMY_DATABASE_URI)
+
 
 # [For SQLite connection]
+from sqlalchemy import text, create_engine
+
 engine = create_engine(
     SQLALCHEMY_DATABASE_URI,
     # only required for sqlite
@@ -48,37 +56,55 @@ DROP TABLE IF EXISTS company;
 """)
 db.execute(sql)
 
-### (1) create table
+### (1.1) create table
 sql = text("""
 CREATE TABLE IF NOT EXISTS company (
-	id int NOT NULL,
-	name varchar(255) NOT NULL,
-	ceo varchar(255) NOT NULL
+    id int AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    company_code varchar(255) NOT NULL,
+    name varchar(255) NOT NULL,
+    ceo varchar(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """)
 db.execute(sql)
+print(">>> 1.1 raw sql created table")
+
+sql = text("""
+DROP TABLE IF EXISTS company;
+""")
+db.execute(sql)
+print(">>> 1.1 raw sql dropped table")
+
+### (1.2) create table
+# https://docs.sqlalchemy.org/en/14/orm/tutorial.html
+from sqlalchemy import MetaData
+from data_model import Base
+Base.metadata.create_all(engine)
+print(">>> 1.2 Python Class created table")
+
 
 ### (2) insert data
-data = ({"id": 1, "name": "The Hobbit", "ceo": "Tolkien"},
-        {"id": 2, "name": "The Silmarillion", "ceo": "Tolkien"},
-        {"id": 3, "name": "Google", "ceo": "aaa"},
-        {"id": 4, "name": "NVDA", "ceo": "bbb"},
+data = ({"id": 1, "company_code":"N1", "name": "The Hobbit",         "ceo": "Tolkien",},
+        {"id": 2, "company_code":"D2", "name": "The Silmarillion",   "ceo": "Tolkien"},
+        {"id": 3, "company_code":"G1", "name": "Google",             "ceo": "aaa"},
+        {"id": 4, "company_code":"I4", "name": "NVDA",               "ceo": "bbb"},
         )
 
 for line in data:
     sql = text("""
-    INSERT INTO company(id, name, ceo) VALUES(:id, :name, :ceo)
+    INSERT INTO company(id, company_code, name, ceo) VALUES(:id, :company_code, :name, :ceo)
     """)
     _engine = db.get_bind()
     _engine.execute(sql, **line)
 
 ### (2) sql bulk insert
 sql = text("""
-INSERT INTO company(id, name, ceo) VALUES 
-(99,'bulk1','ceo1'),
-(88,'bulk2','ceo2'),
-(77,'bulk3','ceo3'),
-(66,'bulk4','ceo4');
+INSERT INTO company(id, company_code, name, ceo) VALUES 
+(99,'c99','bulk1','ceo1'),
+(88,'p88','bulk2','ceo2'),
+(77,'e77','bulk3','ceo3'),
+(66,'h66','bulk4','ceo4');
 """)
 # db.execute(sql)       #not work
 _engine = db.get_bind()
@@ -96,10 +122,14 @@ print(list(results))
 
 ### Output
 # [
-#     (1, 'The Hobbit', 'Tolkien'),
-#     (2, 'The Silmarillion', 'Tolkien'),
-#     (3, 'Google', 'aaa'),
-#     (4, 'NVDA', 'bbb')
+#     (1, 'N1', 'The Hobbit', 'Tolkien'),
+#     (2, 'D2', 'The Silmarillion', 'Tolkien'),
+#     (3, 'G1', 'Google', 'aaa'),
+#     (4, 'I4', 'NVDA', 'bbb'),
+#     (99, 'c99', 'bulk1', 'ceo1'),
+#     (88, 'p88', 'bulk2', 'ceo2'),
+#     (77, 'e77', 'bulk3', 'ceo3'),
+#     (66, 'h66', 'bulk4', 'ceo4')
 # ]
 
 ################################################
@@ -132,8 +162,10 @@ for schema in schemas:
 ### Output
 # schema: main
 # Column: {'name': 'version_num', 'type': VARCHAR(length=32), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 1}
-# Column: {'name': 'id', 'type': INTEGER(), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
-# Column: {'name': 'name', 'type': TEXT(length=25), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
+# Column: {'name': 'id', 'type': INTEGER(), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 1}
+# Column: {'name': 'company_code', 'type': VARCHAR(length=255), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
+# Column: {'name': 'name', 'type': VARCHAR(length=255), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
+# Column: {'name': 'ceo', 'type': VARCHAR(length=255), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
 # Column: {'name': 'id', 'type': INTEGER(), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 1}
 # Column: {'name': 'label', 'type': VARCHAR(length=256), 'nullable': False, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}
 # Column: {'name': 'url', 'type': VARCHAR(length=256), 'nullable': True, 'default': None, 'autoincrement': 'auto', 'primary_key': 0}

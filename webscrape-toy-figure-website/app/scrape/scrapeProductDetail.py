@@ -1,8 +1,11 @@
 from typing import List, Union
 from urllib.error import HTTPError, URLError
-from scrape.helper import commonHelper
-from scrape import helper
+from app.models.products import Products
+from app import deps
+from app.scrape.helper import commonHelper
+from app.scrape.helperDatabse import databseHelper
 
+from sqlalchemy.orm import Session
 import re
 import urllib.request
 from bs4 import BeautifulSoup
@@ -11,7 +14,7 @@ import pandas as pd
 pd.set_option("display.max_columns", None)
 
 
-class scrapeProductDetail(commonHelper):
+class scrapeProductDetail(commonHelper, databseHelper):
 
     def __init__(self,
                  shop: str,
@@ -126,25 +129,78 @@ class scrapeProductDetail(commonHelper):
             _whole_url = self.url_pattern.format(shop_product_code=_exist_product.get("shop_product_code"))
             print('>>> _whole_url:', _whole_url)
 
-            _data = self.scrapeOnePageData(url=_whole_url, **_exist_product)
-            self.data_list.append(_data)
+            result = self.scrapeOnePageData(url=_whole_url, **_exist_product)
+            self.data_list.append(result)
 
 
-    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list', save_in_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
         '''
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
 
         _df = pd.DataFrame(self.data_list)
-        filename = f"shop={self.shop}"
-        self.saveFile(data=_df,
-                      shop=self.shop,
-                      folder=self.scraped_file_folder,
-                      filename=filename,
-                      data_type="csv")
+        if save_in_csv:
+            filename = f"shop={self.shop}"
+            self.saveFile(data=_df,
+                          shop=self.shop,
+                          folder=self.scraped_file_folder,
+                          filename=filename,
+                          data_type="csv")
 
         return_data = {
             'dict_list': self.data_list,
             'dataframe': _df,
         }
         return return_data[return_type]
+
+    def saveInDb(self, db: Session=next(deps.get_db()), new_details: List[dict] = []):
+        def checkDbTable():
+            from sqlalchemy import inspect
+            _engine = db.get_bind()
+            inspector = inspect(_engine)
+            schemas = inspector.get_schema_names()
+            for schema in schemas:
+                print("schema: %s" % schema)
+                for table_name in inspector.get_table_names(schema=schema):
+                    for column in inspector.get_columns(table_name, schema=schema):
+                        print("Column: %s" % column)
+
+        ### testing
+        # checkDbTable()
+
+        ### Outside data
+        new_details = self.data_list if len(new_details) == 0 else new_details
+
+        ### Get all data in the DB
+        old_details = db.query(Products).all()
+        
+        _update: List = []
+        _insert: List = []
+
+        ### If some records already exist in db
+        # 1. Existed records
+        #    a. [x,missing logic] No difference in data     ==> drop this record
+        #    b. [x,missing logic] Have difference in data   ==> update this record
+        # 2. Totally new records ==> insert
+        if len(old_details) > 0:
+            _old_max_id = max([_.id for _ in old_details])
+
+            # split new records into (1) update (2) insert
+            for _new_detail in new_details:
+                _old_detail = list(filter(lambda _old_detail: _old_detail.shop_product_code == _new_detail["shop_product_code"], old_details))
+                _old_detail = _old_detail[0] if len(_old_detail) > 0 else None
+                if _old_detail is not None:
+                    _update.append({**_new_detail, "id":_old_detail.id})
+                else:
+                    _old_max_id += 1
+                    _insert.append({**_new_detail, "id":_old_max_id})
+
+            print(">>> len(_update)={}, _update={}".format(len(_update), _update[:3]))
+            print(">>> len(_insert)={}, _insert={}".format(len(_insert), _insert[:3]))
+
+            self.bulkInsert(db=db, db_table_model=Products, data_in=_insert)
+            self.bulkUpdate(db=db, db_table_model=Products, data_in=_update)
+
+        ### If NO records exist in db, all new records need insert
+        else:
+            self.bulkInsert(db=db, db_table_model=Products, data_in=new_details)
