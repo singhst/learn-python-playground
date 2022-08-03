@@ -26,7 +26,7 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html#creating-an-environment
    $ poetry install
    ```
 
-1. Create a Migration Script
+1. (Can skip if versions .py exists) Create a Migration Script
    ```shell
    $ alembic revision --autogenerate -m "Added initial table"
    INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
@@ -35,27 +35,35 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html#creating-an-environment
    INFO  [alembic.autogenerate.compare] Detected added index 'ix_products_id' on '['id']'
       Generating /xxx/learn-python-playground/webscrape-toy-figure-website/alembic/versions/abe926e73e7c_added_initial_table.py ...  done
    ```
-2. Running our First Migration 
-   
-   = create tables by the generated `/alembic/versions/abe926e73e7c_added_initial_table.py`
-   
+
+2. Prestart the application
+   1. (Can run below `poetry run ./prestart.sh` instead) Running our First Migration 
+      
+      = create tables by the generated `/alembic/versions/abe926e73e7c_added_initial_table.py`
+      
+      ```shell
+      $ alembic upgrade head
+      INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+      INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+      INFO  [alembic.runtime.migration] Running upgrade  -> 9b32b90db2fb, Added initial tables
+      ```
+   2. OR Run
+      ```shell
+      $ poetry run ./prestart.sh
+      INFO:__main__:Initializing service
+      INFO:__main__:Starting call to '__main__.init', this is the 1st time calling it.
+      INFO:__main__:Service finished initializing
+      INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+      INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+      INFO  [alembic.runtime.migration] Running upgrade  -> abe926e73e7c, Added initial table
+      INFO:__main__:Creating initial data
+      INFO:__main__:Initial data created
+      ```
+
+3. Start to scrape all-product table
    ```shell
-   $ alembic upgrade head
-   INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
-   INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
-   INFO  [alembic.runtime.migration] Running upgrade  -> 9b32b90db2fb, Added initial tables
-   ```
-3. Run
-   ```shell
-   $ poetry run ./prestart.sh
-   INFO:__main__:Initializing service
-   INFO:__main__:Starting call to '__main__.init', this is the 1st time calling it.
-   INFO:__main__:Service finished initializing
-   INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
-   INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
-   INFO  [alembic.runtime.migration] Running upgrade  -> abe926e73e7c, Added initial table
-   INFO:__main__:Creating initial data
-   INFO:__main__:Initial data created
+   $ python app/main.py
+   
    ```
 
 

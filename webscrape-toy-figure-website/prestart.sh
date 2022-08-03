@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
 # Let the DB start
+# = Try to create session to check if DB is awake
 python ./app/backend_pre_start.py
 
 # Run migrations

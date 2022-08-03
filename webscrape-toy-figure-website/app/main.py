@@ -62,7 +62,7 @@ def main():
                                      )
     listScrapper.scrapeAllPageData()
 
-    _product_list = listScrapper.getAllPageData(return_type='dict_list', save_as_csv=True)
+    _product_list = listScrapper.getAllPageData(return_type='dict_list', save_in_csv=True)
 
     print(len(_product_list), len(_product_list[0].keys()))
     print(_product_list[:3])
@@ -81,7 +81,8 @@ def main():
                                          )
 
     detailScrapper.scrapeAllPageData()
-    _product_details = detailScrapper.getAllPageData(return_type='dict_list', save_as_csv=True)
+    detailScrapper.saveInDb()
+    _product_details = detailScrapper.getAllPageData(return_type='dict_list', save_in_csv=True)
 
     print(len(_product_details), len(_product_details[0].keys()))
     print(_product_details[:3])

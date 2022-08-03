@@ -10,9 +10,6 @@ import pandas as pd
 
 class commonHelper():
 
-    def __init__(self):
-        pass
-
     def saveFile(self, data: Union[pd.DataFrame, BeautifulSoup],
                 shop: str,
                 folder: str,

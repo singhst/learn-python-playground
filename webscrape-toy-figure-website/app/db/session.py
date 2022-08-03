@@ -11,6 +11,8 @@ SQLALCHEMY_DATABASE_URI = config["sqlite"].get("connection_str") #"sqlite:///exa
 # [For SQLite connection]
 engine = create_engine(
     SQLALCHEMY_DATABASE_URI,
+    # echo=False, # stop printing SQL statement when doing CRUD operations
+    echo=True,
     # only required for sqlite
     connect_args={"check_same_thread": False},
 )

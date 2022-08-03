@@ -101,7 +101,7 @@ class scrapeProductList(commonHelper):
                 break
 
 
-    def getAllPageData(self, return_type: str = 'dict_list', save_as_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list', save_in_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
         '''
         Save the scraped product details into `.csv`, and return based on input.
         
@@ -109,7 +109,7 @@ class scrapeProductList(commonHelper):
         '''
 
         _df = pd.DataFrame(self.data_list)
-        if save_as_csv:
+        if save_in_csv:
             filename = f"shop={self.shop}"
             self.saveFile(data=_df,
                           shop=self.shop,
