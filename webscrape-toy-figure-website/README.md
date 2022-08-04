@@ -2,7 +2,7 @@
 
 # Sample data
 
-<img src="img\img/db-sqlite-sample-data.png" style="zoom:50%;"/>
+<img src="img/db-sqlite-sample-data.png" style="zoom:50%;"/>
 
 # Run scrapping and save into database
 
