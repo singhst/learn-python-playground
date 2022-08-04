@@ -1,5 +1,8 @@
 # webscrape-toy-figure-website
 
+# Sample data
+
+<img src="img\img/db-sqlite-sample-data.png" style="zoom:50%;"/>
 
 # Run scrapping and save into database
 
