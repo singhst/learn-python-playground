@@ -65,13 +65,32 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html#creating-an-environment
 
 3. Start to scrape all-product table
    ```shell
+   $ poetry run python app/main.py
+   
+   # Use without `poetry`
    $ python app/main.py
    
    ```
 
+   Output:
+   ```shell
+   /xxx/xxx/learn-python-playground/webscrape-toy-figure-website/app
+   /xxx/xxx/learn-python-playground/webscrape-toy-figure-website
+   >>> config= {'shop': '05-001', 'domain': 'https://p-bandai.com', 'product_list_slug': '/hk/search?text=&sort=relevance&shop={}&page={}', 'product_detail_slug': '/hk/item/{shop_product_code}', 'scraped_product_list_file_folder': './product_list/', 'scraped_product_detail_file_folder': './product_detail/', 'product_list_url': 'https://p-bandai.com/hk/search?text=&sort=relevance&shop={}&page={}', 'product_detail_url': 'https://p-bandai.com/hk/item/{shop_product_code}'}
+   >>> _whole_url: https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=0
+   >>> _whole_url: https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=1
+   ...
+   >>> __init__(), kwargs.keys()= dict_keys(['existing_product_list'])
+   >>> _whole_url: https://p-bandai.com/hk/item/N2634941001001
+   >>> scrapeOnePageData(), kwargs= {'url': 'https://p-bandai.com/hk/item/N2634941001001', 'page': 0, 'name': 'S.H.Figuarts IMIT-ULTRAMAN (SHIN ULTRAMAN)', 'img_url': 'https://p-bandai.com/img/hk/p/t/N2634941001001_001.jpg'}
+   >>> url= https://p-bandai.com/hk/item/N2634941001001; shop_product_code= N2634941001001
+   <class 'bs4.element.Tag'>
+   >>> product__schedule= {'配送月份': '2023. 4', '開始預購': '2022. 8.5 15:00', '截止預購': None, '公司': 'BANDAI NAMCO ASIA CO., LTD.'}
+   ...
+   ```
 
 ---
-
+<!-- 
 # Run scrapping and save as .csv only
 
 ```shell
@@ -144,4 +163,4 @@ drwxr-xr-x  6 user  staff     192  4 Jul 23:00 app
 drwxr-xr-x  4 user  staff     128  4 Jul 23:05 product_list
 -rw-r--r--  1 user  staff     418  4 Jul 00:51 requirements.txt
 drwxr-xr-x  7 user  staff     224  4 Jul 01:26 venv
-```
+``` -->
