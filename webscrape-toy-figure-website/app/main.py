@@ -61,8 +61,8 @@ def main():
                                      max_page_number=2, #comment `max_page_number` to scrape 1000 pages
                                      )
     listScrapper.scrapeAllPageData()
-
-    _product_list = listScrapper.getAllPageData(return_type='dict_list', save_in_csv=True)
+    listScrapper.saveInCsv()
+    _product_list = listScrapper.getAllPageData(return_type='dict_list')
 
     print(len(_product_list), len(_product_list[0].keys()))
     print(_product_list[:3])
@@ -81,8 +81,9 @@ def main():
                                          )
 
     detailScrapper.scrapeAllPageData()
+    detailScrapper.saveInCsv()
     detailScrapper.saveInDb()
-    _product_details = detailScrapper.getAllPageData(return_type='dict_list', save_in_csv=True)
+    _product_details = detailScrapper.getAllPageData(return_type='dict_list')
 
     print(len(_product_details), len(_product_details[0].keys()))
     print(_product_details[:3])
