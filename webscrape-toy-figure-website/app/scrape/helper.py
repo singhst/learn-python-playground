@@ -10,7 +10,7 @@ import pandas as pd
 
 class commonHelper():
 
-    def saveFile(self, data: Union[pd.DataFrame, BeautifulSoup],
+    def _saveFile(self, data: Union[pd.DataFrame, BeautifulSoup],
                 shop: str,
                 folder: str,
                 filename: str,
@@ -20,7 +20,7 @@ class commonHelper():
         path = f"{folder}/{data_type}/shop={shop}/dt={yyyymmdd}/"
         filename = f"{filename}_{yyyymmdd}.{data_type}"
         save_path = f"{path}/{filename}"
-        self.checkFolderPath(path)
+        self._checkFolderPath(path)
         
         {
             # immediately invoked function
@@ -29,7 +29,7 @@ class commonHelper():
         }.get(data_type)('')
 
 
-    def checkFolderPath(self, folder_path: str):
+    def _checkFolderPath(self, folder_path: str):
         # Create a new directory because it does not exist 
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)

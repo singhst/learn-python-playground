@@ -8,6 +8,12 @@ pd.set_option("display.max_columns", None)
 
 
 class scrapeProductList(commonHelper):
+    """
+    `url_pattern`: `str`, E.g., `https://p-bandai.com/hk/search?text=&sort=relevance&shop={}&page={}`
+    `shop`: `str`, shop code in the website. E.g., `05-001`
+    `scraped_file_folder`: `str`, the folder name to save the scraped data with .csv format.
+    `max_page_number`: `int`, The maximum number of product list pages (HTML pages) to be scraped. Default `1000`.
+    """
 
     def __init__(self,
                  url_pattern: str,
@@ -51,7 +57,7 @@ class scrapeProductList(commonHelper):
         # print(type(products))
 
         filename = "shop={}_page={}".format(self.shop, self._page_number)
-        self.saveFile(data=products, 
+        self._saveFile(data=products, 
                 folder=self.scraped_file_folder, 
                 shop=self.shop,
                 filename=filename, 
@@ -67,7 +73,6 @@ class scrapeProductList(commonHelper):
             }
             data.append(result)
 
-        # sing> change back to return `list of dict`
         return data #pd.DataFrame(data)
 
 
@@ -101,24 +106,22 @@ class scrapeProductList(commonHelper):
                 break
 
 
-    def getAllPageData(self, return_type: str = 'dict_list', save_in_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
         '''
         Save the scraped product details into `.csv`, and return based on input.
         
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
-
-        _df = pd.DataFrame(self.data_list)
-        if save_in_csv:
-            filename = f"shop={self.shop}"
-            self.saveFile(data=_df,
-                          shop=self.shop,
-                          folder=self.scraped_file_folder,
-                          filename=filename,
-                          data_type="csv")
-
         return_data = {
             'dict_list': self.data_list,
-            'dataframe': _df,
+            'dataframe': pd.DataFrame(self.data_list),
         }
         return return_data[return_type]
+
+
+    def saveInCsv(self):
+        self._saveFile(data=pd.DataFrame(self.data_list),
+                       shop=self.shop,
+                       folder=self.scraped_file_folder,
+                       filename=f"shop={self.shop}",
+                       data_type="csv")
