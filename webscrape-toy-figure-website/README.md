@@ -29,7 +29,7 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html#creating-an-environment
    $ poetry install
    ```
 
-1. (Can skip if versions .py exists) Create a Migration Script
+1. (Can skip if `.py` exists under `/alembic/versions` folder) Create a Migration Script
    ```shell
    $ alembic revision --autogenerate -m "Added initial table"
    INFO  [alembic.runtime.migration] Context impl SQLiteImpl.

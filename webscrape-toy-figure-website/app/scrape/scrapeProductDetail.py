@@ -1,6 +1,6 @@
 from typing import List, Union
 from urllib.error import HTTPError, URLError
-from app.models.products import Products
+from app.models.product import Product
 from app import deps
 from app.scrape.helper import commonHelper
 from app.scrape.helperDatabse import databseHelper
@@ -170,14 +170,14 @@ class scrapeProductDetail(commonHelper, databseHelper):
         new_details = self.data_list if len(new_details) == 0 else new_details
 
         ### Get all data in the DB
-        old_details = db.query(Products).all()
+        old_details = db.query(Product).all()
         
         _update: List = []
         _insert: List = []
 
         if len(old_details) == 0:
             ### If NO records exist in db, all new records need insert
-            self.bulkInsert(db=db, db_table_data_model=Products, data_in=new_details)
+            self.bulkInsert(db=db, db_table_data_model=Product, data_in=new_details)
         else:
             ### If some records already exist in db
             # 1. Existed records        ==> update this record
@@ -197,5 +197,5 @@ class scrapeProductDetail(commonHelper, databseHelper):
             print(">>> len(_update)={}, _update={}".format(len(_update), _update[:3]))
             print(">>> len(_insert)={}, _insert={}".format(len(_insert), _insert[:3]))
 
-            self.bulkInsert(db=db, db_table_data_model=Products, data_in=_insert)
-            self.bulkUpdate(db=db, db_table_data_model=Products, data_in=_update)
+            self.bulkInsert(db=db, db_table_data_model=Product, data_in=_insert)
+            self.bulkUpdate(db=db, db_table_data_model=Product, data_in=_update)
