@@ -73,7 +73,6 @@ class scrapeProductList(commonHelper):
             }
             data.append(result)
 
-        # sing> change back to return `list of dict`
         return data #pd.DataFrame(data)
 
 
