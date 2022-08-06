@@ -13,6 +13,7 @@ class scrapeProductList(commonHelper):
     `shop`: `str`, shop code in the website. E.g., `05-001`
     `scraped_file_folder`: `str`, the folder name to save the scraped data with .csv format.
     `max_page_number`: `int`, The maximum number of product list pages (HTML pages) to be scraped. Default `1000`.
+    `save_html`: `bool`, `True` to save the scrapped HTML page as `.html`. Otherwise `False`
     """
 
     def __init__(self,
@@ -20,11 +21,13 @@ class scrapeProductList(commonHelper):
                  shop: str,
                  scraped_file_folder: str="",
                  max_page_number: int=1000,
+                 save_html: bool=False,
                  ) -> None:
         self.url_pattern = url_pattern
         self.shop = shop
         self.scraped_file_folder = scraped_file_folder
         self.max_page_number = max_page_number
+        self.save_html = save_html
 
         self._page_number: int = 0               # current scrapping page number of the product list
         self.data_list: List[dict] = []     #: List[pd.Dataframe] = []
@@ -56,12 +59,13 @@ class scrapeProductList(commonHelper):
         products = soup_object.find_all("div", {"class": "col-xs-6 col-sm-6 col-md-4 col-lg-3"})
         # print(type(products))
 
-        filename = "shop={}_page={}".format(self.shop, self._page_number)
-        self._saveFile(data=products, 
-                folder=self.scraped_file_folder, 
-                shop=self.shop,
-                filename=filename, 
-                data_type="html")
+        if self.save_html:
+            filename = "shop={}_page={}".format(self.shop, self._page_number)
+            self._saveFile(data=products,
+                           folder=self.scraped_file_folder,
+                           shop=self.shop,
+                           filename=filename,
+                           data_type="html")
 
         data = []
         for product in products:
