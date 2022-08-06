@@ -31,7 +31,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
         # self.shop_product_codes: Union[str, List[str]] = [shop_product_codes] if isinstance(shop_product_codes, str) else shop_product_codes
         self.scraped_file_folder: str = scraped_file_folder
 
-        print(">>> __init__(), kwargs=",kwargs)
+        print(">>> __init__(), kwargs.keys()=",kwargs.keys())
         self.existing_product_list: List[dict] = kwargs.get("existing_product_list") if {"existing_product_list"}.issubset(kwargs.keys()) else None
         # self.existing_product_list: List[dict] = kwargs if (kwargs.keys() >= set('shop_product_codes', 'img_url')) else None   # `a >= b`: (1) is `a` the superset of `b`? (2) is `b` the subset of `a`?
 
@@ -177,30 +177,27 @@ class scrapeProductDetail(commonHelper, databseHelper):
         _update: List = []
         _insert: List = []
 
-        ### If some records already exist in db
-        # 1. Existed records
-        #    a. [x,missing logic] No difference in data     ==> drop this record
-        #    b. [x,missing logic] Have difference in data   ==> update this record
-        # 2. Totally new records ==> insert
-        if len(old_details) > 0:
-            _old_max_id = max([_.id for _ in old_details])
+        if len(old_details) == 0:
+            ### If NO records exist in db, all new records need insert
+            self.bulkInsert(db=db, db_table_data_model=Products, data_in=new_details)
+        else:
+            ### If some records already exist in db
+            # 1. Existed records        ==> update this record
+            # 2. Totally new records    ==> insert
+            _max_id = max([_.id for _ in old_details])
 
             # split new records into (1) update (2) insert
             for _new_detail in new_details:
-                _old_detail = list(filter(lambda _old_detail: _old_detail.shop_product_code == _new_detail["shop_product_code"], old_details))
-                _old_detail = _old_detail[0] if len(_old_detail) > 0 else None
-                if _old_detail is not None:
-                    _update.append({**_new_detail, "id":_old_detail.id})
+                _existed_detail = list(filter(lambda _old_detail: _old_detail.shop_product_code == _new_detail["shop_product_code"], old_details))
+                _existed_detail = _existed_detail[0] if len(_existed_detail) > 0 else None
+                if _existed_detail is not None:
+                    _update.append({**_new_detail, "id":_existed_detail.id})
                 else:
-                    _old_max_id += 1
-                    _insert.append({**_new_detail, "id":_old_max_id})
+                    _max_id += 1
+                    _insert.append({**_new_detail, "id":_max_id})
 
             print(">>> len(_update)={}, _update={}".format(len(_update), _update[:3]))
             print(">>> len(_insert)={}, _insert={}".format(len(_insert), _insert[:3]))
 
-            self.bulkInsert(db=db, db_table_model=Products, data_in=_insert)
-            self.bulkUpdate(db=db, db_table_model=Products, data_in=_update)
-
-        ### If NO records exist in db, all new records need insert
-        else:
-            self.bulkInsert(db=db, db_table_model=Products, data_in=new_details)
+            self.bulkInsert(db=db, db_table_data_model=Products, data_in=_insert)
+            self.bulkUpdate(db=db, db_table_data_model=Products, data_in=_update)
