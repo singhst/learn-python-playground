@@ -7,14 +7,14 @@ ModelType = TypeVar("ModelType", bound=Base)
 class databseHelper():
     def bulkInsert(self,
                    db: Session,
-                   db_table_model: Type[ModelType],
+                   db_table_data_model: Type[ModelType],
                    data_in: List[dict]):
-        db.bulk_insert_mappings(db_table_model, data_in)
+        db.bulk_insert_mappings(db_table_data_model, data_in)
         db.commit()
 
     def bulkUpdate(self,
                    db: Session,
-                   db_table_model: Type[ModelType],
+                   db_table_data_model: Type[ModelType],
                    data_in: List[dict]):
-        db.bulk_update_mappings(db_table_model, data_in)
+        db.bulk_update_mappings(db_table_data_model, data_in)
         db.commit()
