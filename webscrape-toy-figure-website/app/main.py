@@ -58,7 +58,7 @@ def main():
     listScrapper = scrapeProductList(url_pattern=config.get("product_list_url"),
                                      shop=config.get("shop"),
                                      scraped_file_folder=config.get("scraped_product_list_file_folder"),
-                                     max_page_number=2,
+                                     max_page_number=2, #comment `max_page_number` to scrape 1000 pages
                                      )
     listScrapper.scrapeAllPageData()
 

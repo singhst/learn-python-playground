@@ -133,25 +133,23 @@ class scrapeProductDetail(commonHelper, databseHelper):
             self.data_list.append(result)
 
 
-    def getAllPageData(self, return_type: str = 'dict_list', save_in_csv: bool = False) -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
         '''
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
-
-        _df = pd.DataFrame(self.data_list)
-        if save_in_csv:
-            filename = f"shop={self.shop}"
-            self.saveFile(data=_df,
-                          shop=self.shop,
-                          folder=self.scraped_file_folder,
-                          filename=filename,
-                          data_type="csv")
-
         return_data = {
             'dict_list': self.data_list,
-            'dataframe': _df,
+            'dataframe': pd.DataFrame(self.data_list),
         }
         return return_data[return_type]
+
+    def saveInCsv(self):
+        self._saveFile(data=pd.DataFrame(self.data_list),
+                       shop=self.shop,
+                       folder=self.scraped_file_folder,
+                       filename=f"shop={self.shop}",
+                       data_type="csv")
+
 
     def saveInDb(self, db: Session=next(deps.get_db()), new_details: List[dict] = []):
         def checkDbTable():
