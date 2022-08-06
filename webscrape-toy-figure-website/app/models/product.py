@@ -1,11 +1,11 @@
 import datetime
-from sqlalchemy import Column, DateTime, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
 
-class Products(Base):
+class Product(Base):
     id                  = Column(Integer,       nullable=False, primary_key=True)
     name                = Column(String(256),   nullable=True)
     shop_product_code   = Column(String(256),   nullable=True,  index=True)
@@ -22,8 +22,11 @@ class Products(Base):
     updated_at          = Column(DateTime,      default=datetime.datetime.now, onupdate=datetime.datetime.now)
     update_by           = Column(String(256),   nullable=True)
 
+    order = relationship("Order", back_populates="products")
+
+
     def __repr__(self):
-        _string = f"""Products(
+        _string = f"""Product(
             id={self.id!r}, 
             name={self.name!r}, 
             shop_product_code={self.shop_product_code!r}, 
