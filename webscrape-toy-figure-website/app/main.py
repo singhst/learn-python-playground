@@ -59,6 +59,7 @@ def main():
                                      shop=config.get("shop"),
                                      scraped_file_folder=config.get("scraped_product_list_file_folder"),
                                      max_page_number=2, #comment `max_page_number` to scrape 1000 pages
+                                     save_html=True,
                                      )
     listScrapper.scrapeAllPageData()
     listScrapper.saveInCsv()
