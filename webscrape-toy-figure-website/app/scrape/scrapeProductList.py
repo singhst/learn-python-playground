@@ -8,6 +8,12 @@ pd.set_option("display.max_columns", None)
 
 
 class scrapeProductList(commonHelper):
+    """
+    `url_pattern`: `str`, E.g., `https://p-bandai.com/hk/search?text=&sort=relevance&shop={}&page={}`
+    `shop`: `str`, shop code in the website. E.g., `05-001`
+    `scraped_file_folder`: `str`, the folder name to save the scraped data with .csv format.
+    `max_page_number`: `int`, The maximum number of product list pages (HTML pages) to be scraped. Default `1000`.
+    """
 
     def __init__(self,
                  url_pattern: str,
