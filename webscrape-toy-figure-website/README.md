@@ -65,10 +65,10 @@ https://alembic.sqlalchemy.org/en/latest/tutorial.html#creating-an-environment
 
 3. Start to scrape all-product table
    ```shell
-   $ poetry run python app/main.py
+   $ poetry run python app/main_webscrapping.py
    
    # Use without `poetry`
-   $ python app/main.py
+   $ python app/main_webscrapping.py
    
    ```
 
@@ -106,7 +106,7 @@ $ . venv/bin/activate
 $ pip install -r requirement.txt
 
 # Start to scrape all-product table
-$ python app/main.py 
+$ python app/main_webscrapping.py 
 
 >>> _whole_url: https://p-bandai.com/hk/search?text=&sort=relevance&shop=05-001&page=0
 >>> Created folder: ./product_list//html/shop=05-001/dt=20220704/
