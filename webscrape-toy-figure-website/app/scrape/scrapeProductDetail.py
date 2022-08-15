@@ -69,6 +69,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
             #               filename=filename,
             #               data_type="html")
 
+            # just want to preview the values under "m-schedule__td" tag
             product__schedule: dict = {
                 "配送月份": None,
                 "開始預購": None,
@@ -82,6 +83,11 @@ class scrapeProductDetail(commonHelper, databseHelper):
                 product__schedule[_class] = m_schedule.find("p", {"class": "m-schedule__td"}).string
             print(">>> product__schedule=", product__schedule)
 
+            add_to_cart_button_status = product__description.find("button", {"id": "addToCartButton"}).get_text(",",strip=True)
+            print(">>> add_to_cart_button_status=", add_to_cart_button_status, type(add_to_cart_button_status))
+            order_status = add_to_cart_button_status.split(",")[0]
+            print(">>> order_status=", order_status, type(order_status))
+
             result = {
                 "shop_product_code" : shop_product_code,
                 "name"              : kwargs.get("name") if kwargs.get("name") else product__description.find("h1", {"class": "o-product__name"}).string,
@@ -91,7 +97,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
                 "order_time_start"  : datetime.strptime(product__schedule.get("開始預購"), "%Y. %m.%d %H:%M"),
                 # "order_time_end"    : datetime.strptime(product__schedule.get("截止預購"), "%Y. %m.%d %H:%M"),
                 "company"           : product__schedule.get("公司"),
-                "order_status"      : False if "disabled" in product__description.find("button", {"id": "addToCartButton"}) else True,
+                "order_status"      : order_status,
                 "is_favourite"      : False, ###>>> need think, look like we need login before scrapping this
                 "img_url"           : kwargs.get("img_url") if kwargs.get("img_url") else soup_object.find("meta", {"property": "og:image"}).get("content"),
                 "scraped_time"      : datetime.now(),
@@ -149,6 +155,13 @@ class scrapeProductDetail(commonHelper, databseHelper):
                        folder=self.scraped_file_folder,
                        filename=f"shop={self.shop}",
                        data_type="csv")
+
+    def saveInJson(self):
+        self._saveFile(data=pd.DataFrame(self.data_list),
+                       shop=self.shop,
+                       folder=self.scraped_file_folder,
+                       filename=f"shop={self.shop}",
+                       data_type="json")
 
 
     def saveInDb(self, db: Session=next(deps.get_db()), new_details: List[dict] = []):
