@@ -1,0 +1,3 @@
+shop_product_code,name,currency,price,delivery_date,order_time_start,company,order_status,is_favourite,img_url,scraped_time,order_time_end
+N2623282001001,xxx,HK$,920.00,2022-11-01,2022-07-01 15:00:00,"BANDAI NAMCO ASIA CO., LTD.",預購已經結束,False,yyyy,2022-08-16 00:26:52.952947,
+11111,xxx,,,,,,,,yyyy,2022-08-16 00:26:53.071147,

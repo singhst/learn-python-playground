@@ -82,7 +82,8 @@ def main():
                                          )
 
     detailScrapper.scrapeAllPageData()
-    detailScrapper.saveInCsv()
+    # detailScrapper.saveInCsv()
+    detailScrapper.saveInJson()
     detailScrapper.saveInDb()
     _product_details = detailScrapper.getAllPageData(return_type='dict_list')
 
