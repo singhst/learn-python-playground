@@ -1,4 +1,6 @@
+node_modules
 *venv*
+.env
 
 webscrape-toy-figure-website/product_list/html/*
 */__pycache__*
