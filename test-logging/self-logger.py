@@ -11,7 +11,8 @@ LOGGING_CONFIG = {
     "version": 1,
     "formatters": {
         "default": {
-            'format': '%(asctime)s [%(filename)s|%(lineno)s|%(levelname)s]: %(message)s',
+            'format': '%(asctime)s [%(funcName)s|%(filename)s|l:%(lineno)s|%(levelname)s]: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         "detail": {
             'format': "%(asctime)s :: %(levelname)s :: %(funcName)s in %(filename)s (l:%(lineno)d) :: %(message)s",
@@ -32,12 +33,12 @@ LOGGING_CONFIG = {
             "level": logging.INFO,
             "formatter": "plain"
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "level": LOGGING_LEVEL,
-            "filename": LOGGING_PATH,
-            "formatter": "default",
-        }
+        # "file": {
+        #     "class": "logging.FileHandler",
+        #     "level": LOGGING_LEVEL,
+        #     "filename": LOGGING_PATH,
+        #     "formatter": "detail",
+        # }
     },
     "loggers": {
         "console_logger": {
@@ -50,29 +51,36 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "propagate": False,
         },
-        "file_logger": {
-            "handlers": ["file"],
-            "level": "INFO",
-            "propagate": False,
-        }
+        # "file_logger": {
+        #     "handlers": ["file"],
+        #     "level": "INFO",
+        #     "propagate": False,
+        # }
     },
     "disable_existing_loggers": True,
 }
 
-if __name__=='__main__':
+if __name__ == '__main__':
     # create folder if not exist
     if not os.path.exists(LOGGING_FOLDER):
         os.makedirs(LOGGING_FOLDER)
 
     # test
     logging.config.dictConfig(LOGGING_CONFIG)
-    # logger = logging.getLogger("console_logger")
-    # logger = logging.getLogger("console_plain_logger")
-    logger = logging.getLogger("file_logger")
 
+    logger_plain = logging.getLogger("console_plain_logger")
+    logger_plain.debug('debug message')
+    logger_plain.info('info message')
+    logger_plain.warning('warning message')
+    logger_plain.error('error message')
+    logger_plain.critical('critical message')
 
-    logger.debug('debug message')
-    logger.info('info message')
-    # logger.warn('warning message')
-    logger.error('error message')
-    logger.critical('critical message')
+    logger_console = logging.getLogger("console_logger")
+    logger_console.debug('debug message')
+    logger_console.info('info message')
+    logger_console.warning('warning message')
+    logger_console.error('error message')
+    logger_console.critical('critical message')
+
+    # logger_file = logging.getLogger("file_logger")
+    # logger_file.error('file: error message')
