@@ -3,6 +3,7 @@ import os
 import logging
 import logging.config
 
+LOGGING_LEVEL = logging.DEBUG
 LOGGING_FOLDER = "./logs"
 LOGGING_FILENAME = f"{datetime.now().strftime('%Y%m%d')}.log"
 LOGGING_PATH = f'{LOGGING_FOLDER}/{LOGGING_FILENAME}'
@@ -10,7 +11,11 @@ LOGGING_CONFIG = {
     "version": 1,
     "formatters": {
         "default": {
-            'format': '%(asctime)s %(filename)s %(lineno)s %(levelname)s %(message)s',
+            'format': '%(asctime)s [%(filename)s|%(lineno)s|%(levelname)s]: %(message)s',
+        },
+        "detail": {
+            'format': "%(asctime)s :: %(levelname)s :: %(funcName)s in %(filename)s (l:%(lineno)d) :: %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         "plain": {
             "format": "%(message)s",
@@ -29,7 +34,7 @@ LOGGING_CONFIG = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "level": 20,
+            "level": LOGGING_LEVEL,
             "filename": LOGGING_PATH,
             "formatter": "default",
         }
@@ -54,15 +59,20 @@ LOGGING_CONFIG = {
     "disable_existing_loggers": True,
 }
 
-# create folder if not exist
-if not os.path.exists(LOGGING_FOLDER):
-    os.makedirs(LOGGING_FOLDER)
+if __name__=='__main__':
+    # create folder if not exist
+    if not os.path.exists(LOGGING_FOLDER):
+        os.makedirs(LOGGING_FOLDER)
 
-# test
-logging.config.dictConfig(LOGGING_CONFIG)
-logger = logging.getLogger("console_logger")
-logger.debug('debug message')
-logger.info('info message')
-logger.warn('warning message')
-logger.error('error message')
-logger.critical('critical message')
+    # test
+    logging.config.dictConfig(LOGGING_CONFIG)
+    # logger = logging.getLogger("console_logger")
+    # logger = logging.getLogger("console_plain_logger")
+    logger = logging.getLogger("file_logger")
+
+
+    logger.debug('debug message')
+    logger.info('info message')
+    # logger.warn('warning message')
+    logger.error('error message')
+    logger.critical('critical message')
