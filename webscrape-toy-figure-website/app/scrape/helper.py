@@ -10,6 +10,11 @@ import pandas as pd
 
 class commonHelper():
 
+    def logger(self):
+        from app.main_webscrapping import mainLogger
+        return mainLogger
+
+
     def _saveFile(self, data: Union[pd.DataFrame, BeautifulSoup],
                 shop: str,
                 folder: str,
@@ -34,7 +39,7 @@ class commonHelper():
         # Create a new directory because it does not exist 
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-            print(">>> Created folder: {}".format(folder_path))
+            self.logger().debug(">>> Created folder: {}".format(folder_path))
 
 
 """

@@ -25,18 +25,21 @@ routing pattern,
 """
 from pathlib import Path
 
+from app.logger import loggerSetup
 from app.scrape.scrapeProductList import scrapeProductList
 from app.scrape.scrapeProductDetail import scrapeProductDetail
 
 import pandas as pd
 pd.set_option("display.max_columns", None)
 
+logSetup = loggerSetup(log_level=20)
+mainLogger = logSetup.get_logger(logger_type="console_plain_logger")  #console_logger, console_plain_logger, file_logger, custom_logger
 
 # Project Directories
 ROOT = Path(__file__).resolve().parent.parent
 BASE_PATH = Path(__file__).resolve().parent
-print(BASE_PATH)
-print(ROOT)
+mainLogger.debug(BASE_PATH)
+mainLogger.debug(ROOT)
 
 def main():
 
@@ -51,7 +54,7 @@ def main():
     }
     config['product_list_url'] = config.get('domain') + config.get('product_list_slug')
     config['product_detail_url'] = config.get('domain') + config.get('product_detail_slug')
-    print('>>> config=', config)
+    mainLogger.debug('>>> config= {}'.format(config))
 
 
     ## (1) Product list
@@ -65,13 +68,12 @@ def main():
     listScrapper.saveInCsv()
     _product_list = listScrapper.getAllPageData(return_type='dict_list')
 
-    print(len(_product_list), len(_product_list[0].keys()))
-    print(_product_list[:3])
-    print()
-    print(_product_list[-3:])
+    mainLogger.debug('{}, {}'.format(len(_product_list), len(_product_list[0].keys())))
+    mainLogger.debug(_product_list[:3])
+    mainLogger.debug(_product_list[-3:])
 
     # shop_product_codes = [_['shop_product_code'] for _ in _results]
-    # print(shop_product_codes[:3])
+    # main_logger.debug(shop_product_codes[:3])
 
 
     ### (2) Each product detail
@@ -87,10 +89,11 @@ def main():
     detailScrapper.saveInDb()
     _product_details = detailScrapper.getAllPageData(return_type='dict_list')
 
-    print(len(_product_details), len(_product_details[0].keys()))
-    print(_product_details[:3])
-    print()
-    print(_product_details[-3:])
+    mainLogger.debug('{}, {}'.format(len(_product_details), len(_product_details[0].keys())))
+    mainLogger.debug(_product_details[:3])
+    mainLogger.debug(_product_details[-3:])
+
+    mainLogger.info(_product_details)
 
 
 if __name__ == "__main__":
