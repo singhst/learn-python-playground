@@ -93,7 +93,8 @@ def main():
     mainLogger.debug(_product_details[:3])
     mainLogger.debug(_product_details[-3:])
 
-    mainLogger.info(_product_details)
+    mainLogger.debug(_product_details)
+    print(_product_details)
 
 
 if __name__ == "__main__":
