@@ -19,4 +19,11 @@ exec(command, (error, stdout, stderr) => {
   }
   console.log(`typeof stdout: ${typeof stdout}`);
   console.log(`stdout: length=${stdout.length}, stdout=\n${stdout.slice(0,40000)}`);
+
+  const stdout_removed_path = stdout.replace(/^\/.*$/gm, "");
+  console.log(stdout_removed_path.slice(0, 100));
+
+  const stdout_json = JSON.parse(stdout_removed_path);
+  console.log(typeof stdout_json);
+
 });

@@ -30,7 +30,7 @@ class commonHelper():
         {
             # immediately invoked function
             "csv": lambda f: data.to_csv(save_path, index=False),
-            "json": lambda f: data.to_json(save_path, orient='records', lines=True),    #one-line json
+            "json": lambda f: data.to_json(save_path, orient='records', lines=True, force_ascii=False),    #one-line json
             "html": lambda f: open(save_path, mode='wt', encoding='utf-8').write(str(data)),
         }.get(data_type)('')
 

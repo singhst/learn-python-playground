@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+# # -*- coding: utf-8 -*-
+
+'''
+To deal with Chinese characters in below dict:
+https://peps.python.org/pep-0263/
+'''
 
 """
 routing pattern,
@@ -29,6 +35,7 @@ from app.logger import loggerSetup
 from app.scrape.scrapeProductList import scrapeProductList
 from app.scrape.scrapeProductDetail import scrapeProductDetail
 
+import json
 import pandas as pd
 pd.set_option("display.max_columns", None)
 
@@ -84,7 +91,7 @@ def main():
                                          )
 
     detailScrapper.scrapeAllPageData()
-    # detailScrapper.saveInCsv()
+    detailScrapper.saveInCsv()
     detailScrapper.saveInJson()
     detailScrapper.saveInDb()
     _product_details = detailScrapper.getAllPageData(return_type='dict_list')
@@ -93,8 +100,14 @@ def main():
     mainLogger.debug(_product_details[:3])
     mainLogger.debug(_product_details[-3:])
 
-    mainLogger.debug(_product_details)
-    print(_product_details)
+    # mainLogger.debug(_product_details)
+    # print(_product_details)
+    # print(detailScrapper.getAllPageData(return_type='json_string'))
+    # print(json.dumps(_product_details,
+    #                  indent=0,
+    #                  ensure_ascii=False,
+    #                  default=str)
+    #       )
 
 
 if __name__ == "__main__":

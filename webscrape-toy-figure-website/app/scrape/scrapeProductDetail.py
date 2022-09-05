@@ -1,3 +1,4 @@
+import json
 from typing import List, Union
 from urllib.error import HTTPError, URLError
 from app.models.product import Product
@@ -144,13 +145,14 @@ class scrapeProductDetail(commonHelper, databseHelper):
             self.data_list.append(result)
 
 
-    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list') -> Union[str, List[dict], pd.DataFrame]:
         '''
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
         return_data = {
             'dict_list': self.data_list,
             'dataframe': pd.DataFrame(self.data_list),
+            'json_string': json.dumps(self.data_list, indent=0, ensure_ascii=False, default=str)
         }
         return return_data[return_type]
 
