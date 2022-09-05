@@ -1,3 +1,4 @@
+import json
 from typing import List, Union
 from urllib.error import HTTPError, URLError
 from app.models.product import Product
@@ -31,11 +32,16 @@ class scrapeProductDetail(commonHelper, databseHelper):
         # self.shop_product_codes: Union[str, List[str]] = [shop_product_codes] if isinstance(shop_product_codes, str) else shop_product_codes
         self.scraped_file_folder: str = scraped_file_folder
 
-        print(">>> __init__(), kwargs.keys()=",kwargs.keys())
+        self.logger().debug(">>> __init__(), kwargs.keys()= {}".format(kwargs.keys()))
         self.existing_product_list: List[dict] = kwargs.get("existing_product_list") if {"existing_product_list"}.issubset(kwargs.keys()) else None
         # self.existing_product_list: List[dict] = kwargs if (kwargs.keys() >= set('shop_product_codes', 'img_url')) else None   # `a >= b`: (1) is `a` the superset of `b`? (2) is `b` the subset of `a`?
 
         self.data_list: List[dict] = []
+
+
+    def logger(self):
+        from app.main_webscrapping import mainLogger
+        return mainLogger
 
 
     def scrapeOnePageData(self,
@@ -45,11 +51,11 @@ class scrapeProductDetail(commonHelper, databseHelper):
         '''
         `kwargs`: `{"url": xxx, "name": xxx, "img_url": xxx}`
         '''
-        print(">>> scrapeOnePageData(), kwargs=", kwargs)
+        self.logger().debug(">>> scrapeOnePageData(), kwargs= {}".format(kwargs))
 
         url = kwargs.get("url") if kwargs.get("url") else self.url_pattern.format(shop_product_code=shop_product_code)
         shop_product_code = kwargs.get("url").split("/")[-1] if kwargs.get("url") else shop_product_code
-        print(">>> url= {}; shop_product_code= {}".format(url, shop_product_code))
+        self.logger().debug(">>> url= {}; shop_product_code= {}".format(url, shop_product_code))
         
         # add User-Agent to header to pretend as browser visit, more detials can be found in FireBug plugin
         # if we don't add the below, error message occurs. ERROR: urllib.error.HTTPError: HTTP Error 403: Forbidden
@@ -60,7 +66,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
             returned_html = urllib.request.urlopen(req).read()
             soup_object = BeautifulSoup(returned_html, 'html.parser')
             product__description = soup_object.find_all("div", {"class": "o-product__description"})[0]
-            print(type(product__description))
+            self.logger().debug(type(product__description))
 
             # filename = "detail-shop_product_code={}".format(shop_product_code)
             # self.saveFile(data=soup_object,
@@ -81,12 +87,12 @@ class scrapeProductDetail(commonHelper, databseHelper):
                 regex = re.compile(r'[\n\r\t]') #remove special characters
                 _class = regex.sub("", _class)
                 product__schedule[_class] = m_schedule.find("p", {"class": "m-schedule__td"}).string
-            print(">>> product__schedule=", product__schedule)
+            self.logger().debug(">>> product__schedule= {}".format(product__schedule))
 
             add_to_cart_button_status = product__description.find("button", {"id": "addToCartButton"}).get_text(",",strip=True)
-            print(">>> add_to_cart_button_status=", add_to_cart_button_status, type(add_to_cart_button_status))
+            self.logger().debug(">>> add_to_cart_button_status= {}, {}".format(add_to_cart_button_status, type(add_to_cart_button_status)))
             order_status = add_to_cart_button_status.split(",")[0]
-            print(">>> order_status=", order_status, type(order_status))
+            self.logger().debug(">>> order_status= {}".format(order_status, type(order_status)))
 
             result = {
                 "shop_product_code" : shop_product_code,
@@ -105,7 +111,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
 
         except HTTPError as error:
             if error.code == 404:
-                print("The server exists but the endpoint does not!")
+                self.logger().debug("The server exists but the endpoint does not!")
                 result = {
                     "shop_product_code" : shop_product_code,
                     "name"              : kwargs.get("name") if kwargs.get("name") else None,
@@ -121,9 +127,9 @@ class scrapeProductDetail(commonHelper, databseHelper):
                     "scraped_time"      : datetime.now(),
                 }
             else:
-                print("The server exists but there was an Internal Error!")
+                self.logger().debug("The server exists but there was an Internal Error!")
         except URLError as error:
-            print("The server does not exist!")
+            self.logger().debug("The server does not exist!")
 
         return result
 
@@ -133,19 +139,20 @@ class scrapeProductDetail(commonHelper, databseHelper):
         for _exist_product in self.existing_product_list:
             
             _whole_url = self.url_pattern.format(shop_product_code=_exist_product.get("shop_product_code"))
-            print('>>> _whole_url:', _whole_url)
+            self.logger().debug('>>> _whole_url: {}'.format(_whole_url))
 
             result = self.scrapeOnePageData(url=_whole_url, **_exist_product)
             self.data_list.append(result)
 
 
-    def getAllPageData(self, return_type: str = 'dict_list') -> Union[List[dict], pd.DataFrame]:
+    def getAllPageData(self, return_type: str = 'dict_list') -> Union[str, List[dict], pd.DataFrame]:
         '''
         `return_type`: `str`, "dict_list" or "dataframe"
         '''
         return_data = {
             'dict_list': self.data_list,
             'dataframe': pd.DataFrame(self.data_list),
+            'json_string': json.dumps(self.data_list, indent=0, ensure_ascii=False, default=str)
         }
         return return_data[return_type]
 
@@ -171,10 +178,10 @@ class scrapeProductDetail(commonHelper, databseHelper):
             inspector = inspect(_engine)
             schemas = inspector.get_schema_names()
             for schema in schemas:
-                print("schema: %s" % schema)
+                self.logger().debug("schema: %s" % schema)
                 for table_name in inspector.get_table_names(schema=schema):
                     for column in inspector.get_columns(table_name, schema=schema):
-                        print("Column: %s" % column)
+                        self.logger().debug("Column: %s" % column)
 
         ### testing
         # checkDbTable()
@@ -207,8 +214,8 @@ class scrapeProductDetail(commonHelper, databseHelper):
                     _max_id += 1
                     _insert.append({**_new_detail, "id":_max_id})
 
-            print(">>> len(_update)={}, _update={}".format(len(_update), _update[:3]))
-            print(">>> len(_insert)={}, _insert={}".format(len(_insert), _insert[:3]))
+            self.logger().debug(">>> len(_update)={}, _update={}".format(len(_update), _update[:3]))
+            self.logger().debug(">>> len(_insert)={}, _insert={}".format(len(_insert), _insert[:3]))
 
             self.bulkInsert(db=db, db_table_data_model=Product, data_in=_insert)
             self.bulkUpdate(db=db, db_table_data_model=Product, data_in=_update)

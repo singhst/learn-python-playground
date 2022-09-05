@@ -10,6 +10,11 @@ import pandas as pd
 
 class commonHelper():
 
+    def logger(self):
+        from app.main_webscrapping import mainLogger
+        return mainLogger
+
+
     def _saveFile(self, data: Union[pd.DataFrame, BeautifulSoup],
                 shop: str,
                 folder: str,
@@ -25,7 +30,7 @@ class commonHelper():
         {
             # immediately invoked function
             "csv": lambda f: data.to_csv(save_path, index=False),
-            "json": lambda f: data.to_json(save_path, orient='records', lines=True),    #one-line json
+            "json": lambda f: data.to_json(save_path, orient='records', lines=True, force_ascii=False),    #one-line json
             "html": lambda f: open(save_path, mode='wt', encoding='utf-8').write(str(data)),
         }.get(data_type)('')
 
@@ -34,7 +39,7 @@ class commonHelper():
         # Create a new directory because it does not exist 
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-            print(">>> Created folder: {}".format(folder_path))
+            self.logger().debug(">>> Created folder: {}".format(folder_path))
 
 
 """
