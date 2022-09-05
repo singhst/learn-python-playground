@@ -33,6 +33,11 @@ class scrapeProductList(commonHelper):
         self.data_list: List[dict] = []     #: List[pd.Dataframe] = []
 
 
+    def logger(self):
+        from app.main_webscrapping import mainLogger
+        return mainLogger
+
+
     def scrapeOnePageData(self,
                           url: str
                           ) -> List[dict]:  #pd.DataFrame:
@@ -57,7 +62,7 @@ class scrapeProductList(commonHelper):
         returned_html = urllib.request.urlopen(req).read()
         soup_object = BeautifulSoup(returned_html, 'html.parser')
         products = soup_object.find_all("div", {"class": "col-xs-6 col-sm-6 col-md-4 col-lg-3"})
-        # print(type(products))
+        self.logger().debug(type(products))
 
         if self.save_html:
             filename = "shop={}_page={}".format(self.shop, self._page_number)
@@ -88,7 +93,7 @@ class scrapeProductList(commonHelper):
 
         while valid_page:
             _whole_url = self.url_pattern.format(self.shop, self._page_number)
-            print('>>> _whole_url:', _whole_url)
+            self.logger().debug('>>> _whole_url: {}'.format(_whole_url))
 
             ### Using pandas df as data structure
             # _df = self.scrapeOnePageData(_whole_url)
