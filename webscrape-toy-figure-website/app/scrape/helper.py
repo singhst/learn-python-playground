@@ -19,11 +19,13 @@ class commonHelper():
                 shop: str,
                 folder: str,
                 filename: str,
+                full_path: str = None,
+                full_filename: str = None,
                 data_type: str = 'csv',
                 ):
         yyyymmdd = datetime.now().strftime('%Y%m%d')
-        path = f"{folder}/{data_type}/shop={shop}/dt={yyyymmdd}/"
-        filename = f"{filename}_{yyyymmdd}.{data_type}"
+        path = f"{folder}/{data_type}/shop={shop}/dt={yyyymmdd}/" if full_path is None else full_path
+        filename = f"{filename}_{yyyymmdd}.{data_type}" if full_filename is None else f"{full_filename}.{data_type}"
         save_path = f"{path}/{filename}"
         self._checkFolderPath(path)
         
