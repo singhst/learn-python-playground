@@ -101,7 +101,7 @@ class scrapeProductDetail(commonHelper, databseHelper):
                 "price"             : product__description.find("span", {"class": "o-product__price"}).string,
                 "delivery_date"     : datetime.strptime(product__schedule.get("配送月份"), "%Y. %m"),
                 "order_time_start"  : datetime.strptime(product__schedule.get("開始預購"), "%Y. %m.%d %H:%M"),
-                # "order_time_end"    : datetime.strptime(product__schedule.get("截止預購"), "%Y. %m.%d %H:%M"),
+                "order_time_end"    : datetime.strptime(product__schedule.get("截止預購"), "%Y. %m.%d %H:%M") if product__schedule.get("截止預購") else None,
                 "company"           : product__schedule.get("公司"),
                 "order_status"      : order_status,
                 "is_favourite"      : False, ###>>> need think, look like we need login before scrapping this
@@ -163,11 +163,13 @@ class scrapeProductDetail(commonHelper, databseHelper):
                        filename=f"shop={self.shop}",
                        data_type="csv")
 
-    def saveInJson(self):
+    def saveInJson(self, full_path: str = None, full_filename: str = None):
         self._saveFile(data=pd.DataFrame(self.data_list),
                        shop=self.shop,
-                       folder=self.scraped_file_folder,
-                       filename=f"shop={self.shop}",
+                       full_path=full_path,
+                       full_filename=full_filename,
+                       folder=self.scraped_file_folder if full_path is not None else None,
+                       filename=f"shop={self.shop}" if full_filename is not None else None,
                        data_type="json")
 
 
