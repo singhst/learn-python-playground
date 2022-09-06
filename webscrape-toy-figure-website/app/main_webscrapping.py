@@ -29,13 +29,14 @@ routing pattern,
     example:
         https://p-bandai.com/hk/item/N2623282001001
 """
+import sys
+import getopt
 from pathlib import Path
 
 from app.logger import loggerSetup
 from app.scrape.scrapeProductList import scrapeProductList
 from app.scrape.scrapeProductDetail import scrapeProductDetail
 
-import json
 import pandas as pd
 pd.set_option("display.max_columns", None)
 
@@ -48,8 +49,34 @@ BASE_PATH = Path(__file__).resolve().parent
 mainLogger.debug(BASE_PATH)
 mainLogger.debug(ROOT)
 
-def main():
 
+# Handle input argments
+def cmdParams():
+    full_path = None
+    full_filename = None
+
+    warning_msg = 'Usage: main.py --full_path="<full path, e.g. `./folder/`>" --full_filename="<`filename`>"'
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],"hpf:",["help", "full_path=", "full_filename="])
+        print("opts: {}".format(opts))
+    except getopt.GetoptError:
+        print(warning_msg)
+        mainLogger.warn(warning_msg)
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h','--help'):
+            print(warning_msg)
+            mainLogger.warn(warning_msg)
+            sys.exit()
+        elif opt in ('-p', '--full_path'):
+            full_path = arg
+        elif opt in ('-f', '--full_filename'):
+            full_filename = arg
+    return full_path, full_filename
+
+
+def main():
+    full_path, full_filename = cmdParams()
     config = {
         'shop': "05-001",
         # 'url': "https://p-bandai.com/hk/search?text=&sort=relevance&shop={}&page={}",
@@ -72,7 +99,7 @@ def main():
                                      save_html=True,
                                      )
     listScrapper.scrapeAllPageData()
-    listScrapper.saveInCsv()
+    # listScrapper.saveInCsv()
     _product_list = listScrapper.getAllPageData(return_type='dict_list')
 
     mainLogger.debug('{}, {}'.format(len(_product_list), len(_product_list[0].keys())))
@@ -91,9 +118,10 @@ def main():
                                          )
 
     detailScrapper.scrapeAllPageData()
-    detailScrapper.saveInCsv()
-    detailScrapper.saveInJson()
-    detailScrapper.saveInDb()
+    # detailScrapper.saveInJson(full_path="./product_detail/", full_filename="product_detail")
+    detailScrapper.saveInJson(full_path=full_path, full_filename=full_filename)
+    # detailScrapper.saveInCsv()
+    # detailScrapper.saveInDb()
     _product_details = detailScrapper.getAllPageData(return_type='dict_list')
 
     mainLogger.debug('{}, {}'.format(len(_product_details), len(_product_details[0].keys())))
