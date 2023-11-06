@@ -7,36 +7,37 @@ from typing import Literal
 
 
 LOGGER_TYPE = Literal[
-    "file_console_logger", 
-    "console_logger", 
-    "console_plain_logger", 
-    "console_custom_logger", 
-    "file_logger"
-    ]
+    "file_console_logger",
+    "console_logger",
+    "console_plain_logger",
+    "console_custom_logger",
+    "file_logger",
+]
 
 
-class loggerSetup():
-    def __init__(self,
-                 logger_type: LOGGER_TYPE = "console_logger",
-                 log_level_lowest: int = logging.INFO,
-                 log_filename: str = f"{datetime.now().strftime('%Y%m%d')}.log",
-                 log_folder: str = "./logs",
-                 custom_log_format: str = "%(message)s",
-                 ) -> None:
+class loggerSetup:
+    def __init__(
+        self,
+        logger_type: LOGGER_TYPE = "console_logger",
+        log_level_lowest: int = logging.INFO,
+        log_filename: str = f"{datetime.now().strftime('%Y%m%d')}.log",
+        log_folder: str = "./logs",
+        custom_log_format: str = "%(message)s",
+    ) -> None:
         self.logging_level_lowest = log_level_lowest
         self.logging_folder = log_folder
         self.logging_filename = log_filename
-        self.logging_path = f'{self.logging_folder}/{self.logging_filename}'
+        self.logging_path = f"{self.logging_folder}/{self.logging_filename}"
         self.logging_config = {
             "version": 1,
             "formatters": {
                 "default": {
                     "format": "%(asctime)s [%(levelname)s|%(funcName)s|%(filename)s|l:%(lineno)s]: %(message)s",
-                    "datefmt": "%Y-%m-%d %H:%M:%S"
+                    "datefmt": "%Y-%m-%d %H:%M:%S",
                 },
                 "detail": {
                     "format": "%(asctime)s :: %(levelname)s :: %(funcName)s in %(filename)s (l:%(lineno)d) :: %(message)s",
-                    "datefmt": "%Y-%m-%d %H:%M:%S"
+                    "datefmt": "%Y-%m-%d %H:%M:%S",
                 },
                 "plain": {
                     "format": "%(message)s",
@@ -54,12 +55,12 @@ class loggerSetup():
                 "console_plain": {
                     "class": "logging.StreamHandler",
                     "level": self.logging_level_lowest,
-                    "formatter": "plain"
+                    "formatter": "plain",
                 },
                 "console_detail": {
                     "class": "logging.StreamHandler",
                     "level": self.logging_level_lowest,
-                    "formatter": "detail"
+                    "formatter": "detail",
                 },
                 "file": {
                     "class": "logging.FileHandler",
@@ -98,12 +99,11 @@ class loggerSetup():
                     "handlers": ["file", "console"],
                     "level": self.logging_level_lowest,
                     "propagate": False,
-                }
+                },
             },
             "disable_existing_loggers": True,
         }
         self.logger = self.initLogger(logger_type=logger_type)
-
 
     def setupExcepthookLogger(self, logger: logging.Logger):
         def handle_exception(exc_type, exc_value, exc_traceback):
@@ -111,14 +111,16 @@ class loggerSetup():
                 sys.__excepthook__(exc_type, exc_value, exc_traceback)
                 return
             logger.critical(
-                "[SYSTEM]::Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback)
+                "[SYSTEM]::Uncaught exception",
+                exc_info=(exc_type, exc_value, exc_traceback),
             )
+
         sys.excepthook = handle_exception
 
-
-    def initLogger(self,
-                   logger_type: str,
-                   ):
+    def initLogger(
+        self,
+        logger_type: str,
+    ):
         # create folder if not exist
         if not os.path.exists(self.logging_folder):
             os.makedirs(self.logging_folder)
@@ -126,7 +128,6 @@ class loggerSetup():
         logging.config.dictConfig(self.logging_config)
 
         return logging.getLogger(logger_type)
-
 
     def getLogger(self) -> logging.Logger:
         return self.logger
@@ -139,16 +140,16 @@ def main():
     )
     logger = logger_setup.getLogger()
 
-    logger.debug('debug message')
-    logger.info('info message')
-    logger.warning('warning message')
-    logger.error('error message')
-    logger.critical('critical message')
+    logger.debug("debug message")
+    logger.info("info message")
+    logger.warning("warning message")
+    logger.error("error message")
+    logger.critical("critical message")
 
     test_logger_can_log_sys_excepthook
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
     ### output
