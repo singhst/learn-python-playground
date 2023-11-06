@@ -150,3 +150,17 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    ### output
+    # $ venv/bin/python logger.py
+    # 2023-11-06 23:40:45 [DEBUG|main|logger.py|l:144]: debug message
+    # 2023-11-06 23:40:45 [INFO|main|logger.py|l:145]: info message
+    # 2023-11-06 23:40:45 [WARNING|main|logger.py|l:146]: warning message
+    # 2023-11-06 23:40:45 [ERROR|main|logger.py|l:147]: error message
+    # 2023-11-06 23:40:45 [CRITICAL|main|logger.py|l:148]: critical message
+    # Traceback (most recent call last):
+    # File "/xxxxx/test-logging/logger.py", line 153, in <module>
+    #     main()
+    # File "/xxxxx/test-logging/logger.py", line 150, in main
+    #     test_logger_can_log_sys_excepthook
+    # NameError: name 'test_logger_can_log_sys_excepthook' is not defined
