@@ -6,3 +6,5 @@ webscrape-toy-figure-website/product_list/html/*
 */__pycache__*
 */*/__pycache__*
 */*/*/__pycache__*
+
+*.log*
