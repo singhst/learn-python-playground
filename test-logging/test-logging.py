@@ -9,9 +9,12 @@ from datetime import datetime
 import os
 import sys
 
-LOGFILE = '/tmp/{0}.{1}.log'.format(
+LOG_LEVEL = 'DEBUG'
+LOGFILE = './logs/test-logging.py-{0}.{1}.log'.format(
     os.path.basename(__file__),
-    datetime.now().strftime('%Y%m%dT%H%M%S'))
+    # datetime.now().strftime('%Y%m%dT%H%M%S')
+    datetime.now().strftime('%Y%m%d')
+    )
 
 DEFAULT_LOGGING = {
     'version': 1,
@@ -21,7 +24,7 @@ DEFAULT_LOGGING = {
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         'simple': {
-            'format': '%(message)s',
+            'format': 'simple :: %(levelname)s :: %(message)s',
         },
     },
     'handlers': {
@@ -36,20 +39,30 @@ DEFAULT_LOGGING = {
             'formatter': 'simple',
             'level': 'INFO',
             'filename': LOGFILE,
-            'mode': 'w',
+            # 'mode': 'w',
+            'mode': 'a',
         },
     },
     'loggers': {
         __name__: {
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'handlers': ['console', 'file'],
             'propagate': False,
         },
     }
 }
 
-logging.basicConfig(level=logging.ERROR)
-logging.config.dictConfig(DEFAULT_LOGGING)
-log = logging.getLogger(__name__)
+if __name__ == "__main__":
+    # logging.basicConfig(level=logging.ERROR)
+    logging.config.dictConfig(DEFAULT_LOGGING)
+    logger = logging.getLogger(__name__)
 
-log.debug('iuwey9e218939170')
+    logger.critical('================================')
+
+    logger.debug('This is a debug-level message')
+    logger.info('This is an info-level message')
+    logger.warning('This is a warning-level message')
+    logger.error('This is an error-level message')
+    logger.critical('This is a critical-level message')
+
+    test_error_message

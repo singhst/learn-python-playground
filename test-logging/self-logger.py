@@ -5,7 +5,7 @@ import logging.config
 
 LOGGING_LEVEL = logging.DEBUG
 LOGGING_FOLDER = "./logs"
-LOGGING_FILENAME = f"{datetime.now().strftime('%Y%m%d')}.log"
+LOGGING_FILENAME = f"self-logger.py_{datetime.now().strftime('%Y%m%d')}.log"
 LOGGING_PATH = f'{LOGGING_FOLDER}/{LOGGING_FILENAME}'
 LOGGING_CONFIG = {
     "version": 1,
@@ -33,12 +33,12 @@ LOGGING_CONFIG = {
             "level": logging.INFO,
             "formatter": "plain"
         },
-        # "file": {
-        #     "class": "logging.FileHandler",
-        #     "level": LOGGING_LEVEL,
-        #     "filename": LOGGING_PATH,
-        #     "formatter": "detail",
-        # }
+        "file": {
+            "class": "logging.FileHandler",
+            "level": logging.DEBUG,
+            "filename": LOGGING_PATH,
+            "formatter": "detail",
+        }
     },
     "loggers": {
         "console_logger": {
@@ -51,22 +51,34 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "propagate": False,
         },
-        # "file_logger": {
-        #     "handlers": ["file"],
-        #     "level": "INFO",
-        #     "propagate": False,
-        # }
+        "file_logger": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "all_in_one_logger": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": False,
+        }
     },
-    "disable_existing_loggers": True,
+    # "disable_existing_loggers": True,
 }
 
-if __name__ == '__main__':
+def main():
     # create folder if not exist
     if not os.path.exists(LOGGING_FOLDER):
         os.makedirs(LOGGING_FOLDER)
 
     # test
     logging.config.dictConfig(LOGGING_CONFIG)
+
+    logger_all_in_one = logging.getLogger("all_in_one_logger")
+    logger_all_in_one.debug('all_in_one_logger: debug message')
+    logger_all_in_one.info('all_in_one_logger: info message')
+    logger_all_in_one.warning('all_in_one_logger: warning message')
+    logger_all_in_one.error('all_in_one_logger: error message')
+    logger_all_in_one.critical('all_in_one_logger: critical message')
 
     logger_plain = logging.getLogger("console_plain_logger")
     logger_plain.debug('debug message')
@@ -82,5 +94,9 @@ if __name__ == '__main__':
     logger_console.error('error message')
     logger_console.critical('critical message')
 
-    # logger_file = logging.getLogger("file_logger")
-    # logger_file.error('file: error message')
+    logger_file = logging.getLogger("file_logger")
+    logger_file.error('file: error message')
+
+
+if __name__ == '__main__':
+    main()

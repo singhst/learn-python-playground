@@ -11,6 +11,7 @@ https://cloud.tencent.com/developer/article/1772559
 @Author : shouke
 '''
 
+import datetime
 import logging
 import logging.config
 
@@ -38,8 +39,9 @@ LOGGING_CONFIG = {
         "file":{
             "class": "logging.FileHandler",
             "level":20,
-            "filename": "./log.txt",
+            "filename": f"./logs/test-logging-2.py-{datetime.datetime.now().date()}.log",
             "formatter": "default",
+            "mode": "a",
         }
     },
     "loggers": {
@@ -57,16 +59,25 @@ LOGGING_CONFIG = {
             "handlers": ["file"],
             "level": "INFO",
             "propagate": False,
+        },
+        "all_in_one_logger":{
+            "handlers": ["console", "file"],
+            # "level": "INFO",
+            "propagate": False,
         }
     },
     "disable_existing_loggers": True,
 }
 
-# 运行测试
-logging.config.dictConfig(LOGGING_CONFIG)
-logger = logging.getLogger("console_logger")
-logger.debug('debug message')
-logger.info('info message')
-logger.warn('warning message')
-logger.error('error message')
-logger.critical('critical message')
+if __name__ == "__main__":
+    # 运行测试
+    logging.config.dictConfig(LOGGING_CONFIG)
+    # logger = logging.getLogger("console_logger")
+    logger = logging.getLogger("all_in_one_logger")
+    logger.debug('debug message')
+    logger.info('info message')
+    logger.warn('warning message')
+    logger.error('error message')
+    logger.critical('critical message')
+
+    test_error_message

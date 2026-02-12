@@ -7,9 +7,11 @@ import logging.config
 import os
 
 
-LOGFILE = '/tmp/{0}.{1}.log'.format(
+LOGFILE = './logs/test-logging-colored-2.py-{0}.{1}.log'.format(
     os.path.basename(__file__),
-    datetime.datetime.now().strftime('%Y%m%dT%H%M%S'))
+    # datetime.datetime.now().strftime('%Y%m%dT%H%M%S'
+    datetime.datetime.now().strftime('%Y%m%d'
+    ))
 
 
 my_logging_dict = {
@@ -51,5 +53,14 @@ my_logging_dict = {
     }
 }
 
-logging.config.dictConfig(my_logging_dict)
-logger = logging.getLogger(__name__)
+if __name__ == "__main__":
+    logging.config.dictConfig(my_logging_dict)
+    logger = logging.getLogger(__name__)
+
+    logger.debug('This is a debug-level message')
+    logger.info('This is an info-level message')
+    logger.warning('This is a warning-level message')
+    logger.error('This is an error-level message')
+    logger.critical('This is a critical-level message')
+
+    test_error_message
